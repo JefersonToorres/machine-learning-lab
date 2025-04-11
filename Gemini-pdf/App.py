@@ -126,7 +126,7 @@ def index():
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="text-center mb-4">
-                        <h1 class="fw-bold text-primary">Gerador de Conclusão de PDF</h1>
+                        <h1 class="fw-bold text-primary">Gerador de Analise Gemini</h1>
                         <p class="text-muted">Faça upload de um PDF para gerar uma conclusão automaticamente e enviá-la por email.</p>
                     </div>
 
