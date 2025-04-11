@@ -8,7 +8,7 @@ import os
 # === CONFIGURAÇÕES ===
 API_TOKEN_BRAPI = 'wd11P6ggfscs5UYkr6XB6t'
 GOOGLE_API_KEY = "AIzaSyBAzeGLTtDWhl3L-GHc7KshqWaGa5_MyG4"
-fii_list = ['MXRF11', 'HGLG11', 'KNRI11', 'VISC11', 'XPML11']
+fii_list = ['CPTR11', 'HGLG11', 'KNRI11', 'RECR11', 'JURO11','TRXF11','HSML11','KNSC11','XPLG11']
 
 # Configura o Gemini
 genai.configure(api_key=GOOGLE_API_KEY)
