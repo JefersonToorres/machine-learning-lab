@@ -7,7 +7,7 @@ import smtplib
 from email.message import EmailMessage
 import traceback
 
-GOOGLE_API_KEY = "AIzaSyDmtYUVOnB6QIje8cntEV36TIfnvy4IRyo"
+GOOGLE_API_KEY = "AIzaSyBAzeGLTtDWhl3L-GHc7KshqWaGa5_MyG4"
 EMAIL_REMETENTE = "jefersontorres006@gmail.com.br"
 EMAIL_PASSWORD = "@Bank.av4578--"
 EMAIL_DESTINATARIO = "silva.torres@hotmail.com"
