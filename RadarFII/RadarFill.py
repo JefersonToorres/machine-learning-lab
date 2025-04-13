@@ -139,7 +139,7 @@ if not df.empty:
 
     # === ENVIA E-MAIL ===
     assunto = f'Relatório FIIs - {today}'
-    corpo = f'Olá,\n\nSegue em anexo o relatório diário dos FIIs com análise e gráfico gerado automaticamente.\n\nAbs,\nSistema de Análise'
+    corpo = f'Olá,\n\nSegue em anexo o relatório diário dos FIIs da Carteira.\n\nAtenciosamente;\nSistema de Análise' 
     enviar_email_outlook(assunto, corpo, EMAIL_DESTINATARIOS, anexo_path=pdf_path)
 
 else:
