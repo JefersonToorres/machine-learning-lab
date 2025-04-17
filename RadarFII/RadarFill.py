@@ -64,6 +64,19 @@ for fii in fii_list:
             })
     except Exception as e:
         print(f'❌ Erro ao buscar {fii}: {e}')
+        
+# Parâmetros de geração
+MAX_TOKENS: int = 4000
+TEMPERATURE: float = 0.0
+TOP_P: float = 0.00
+TOP_K: int = 1
+
+# Parâmetros de validação (se usar modo validate)
+VALIDATION_MAX_TOKENS: int = 5000
+VALIDATION_TEMPERATURE: float = 0.0
+VALIDATION_TOP_P: float = 0.00
+VALIDATION_TOP_K: int = 1
+
 
 # === GERA PDF E ENVIA EMAIL ===
 df = pd.DataFrame(data)
@@ -107,7 +120,7 @@ if not df.empty:
 
     {df.to_string(index=False)}
 
-    Gere um resumo do mercado de FIIs hoje. Destaque os fundos com maior e menor variação, volume negociado e qualquer tendência que se destaque.
+    Gere um resumo do mercado financeiro hj vc é um gestor do fundo Torres Capital aonde voce faz uma analise da sua carteira com detalhes sobre como foi o dia dos seus ativos.
     """
     model = genai.GenerativeModel('gemini-2.0-flash')
     resposta = model.generate_content(prompt)
