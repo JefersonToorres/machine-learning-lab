@@ -101,7 +101,7 @@ if not df.empty:
 
     {df.to_string(index=False)}
 
-    Gere um relatório do mercado financeiro de hoje. Você é um gestor do fundo Torres Capital e deve fazer uma análise detalhada sobre como foi o dia dos seus ativos.
+    Gere um relatório do mercado financeiro de hoje. Você é um gestor do fundo Torres Capital e deve fazer uma análise detalhada sobre como foi o dia dos seus ativos.Me fale sugestoes de investimentos.
     """
     model = genai.GenerativeModel('gemini-2.0-flash')
     resposta = model.generate_content(prompt)
