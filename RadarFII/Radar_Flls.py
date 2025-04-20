@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from datetime import datetime
 import google.generativeai as genai
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 import os
 import win32com.client  
 
@@ -64,28 +61,12 @@ for fii in fii_list:
             })
     except Exception as e:
         print(f'❌ Erro ao buscar {fii}: {e}')
-        
-# Parâmetros de geração
-MAX_TOKENS: int = 4000
-TEMPERATURE: float = 0.0
-TOP_P: float = 0.00
-TOP_K: int = 1
 
-# Parâmetros de validação (se usar modo validate)
-VALIDATION_MAX_TOKENS: int = 5000
-VALIDATION_TEMPERATURE: float = 0.0
-VALIDATION_TOP_P: float = 0.00
-VALIDATION_TOP_K: int = 1
-
-
-# === GERA PDF E ENVIA EMAIL ===
+# === GERA GRÁFICO E ENVIA EMAIL ===
 df = pd.DataFrame(data)
 if not df.empty:
     os.makedirs("relatorios", exist_ok=True)
-
-    # === Caminhos absolutos ===
     grafico_path = os.path.abspath(f"relatorios/variacao_fiis_{datetime.now().strftime('%Y%m%d')}.png")
-    pdf_path = os.path.abspath(f"relatorios/relatorio_fiis_{datetime.now().strftime('%Y%m%d')}.pdf")
 
     # === GRÁFICO BONITO ===
     plt.figure(figsize=(12, 6))
@@ -120,40 +101,22 @@ if not df.empty:
 
     {df.to_string(index=False)}
 
-    Gere um relatorio do mercado financeiro hj você é um gestor do fundo Torres Capital aonde voce faz uma analise da sua carteira com detalhes sobre como foi o dia dos seus ativos.
+    Gere um relatório do mercado financeiro de hoje. Você é um gestor do fundo Torres Capital e deve fazer uma análise detalhada sobre como foi o dia dos seus ativos.
     """
     model = genai.GenerativeModel('gemini-2.0-flash')
     resposta = model.generate_content(prompt)
     analise_texto = resposta.text.strip()
 
-    # === CRIA PDF ===
-    c = canvas.Canvas(pdf_path, pagesize=letter)
-    width, height = letter
-
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(50, height - 50, f"Relatório de FIIs - {today}")
-    c.setFont("Helvetica", 10)
-
-    linhas = analise_texto.split('\n')
-    y = height - 80
-    for linha in linhas:
-        if y < 100:
-            c.showPage()
-            y = height - 50
-        c.drawString(50, y, linha.strip())
-        y -= 12
-
-    if os.path.exists(grafico_path):
-        c.showPage()
-        c.drawImage(ImageReader(grafico_path), 50, 300, width=500, preserveAspectRatio=True, mask='auto')
-
-    c.save()
-    print(f"✅ PDF gerado em: {pdf_path}")
-
-    # === ENVIA E-MAIL ===
+    # === ENVIA SOMENTE A IMAGEM POR EMAIL ===
     assunto = f'Relatório FIIs - {today}'
-    corpo = f'Olá,\n\nSegue em anexo o relatório diário dos FIIs da Carteira.\n\nAtenciosamente;\nTorres Capital\n\n{analise_texto}' 
-    enviar_email_outlook(assunto, corpo, EMAIL_DESTINATARIOS, anexo_path=pdf_path)
+    corpo = (
+        f'Olá,\n\n'
+        f'Segue em anexo o gráfico com as variações diárias dos FIIs da Carteira.\n\n'
+        f'Análise do dia:\n\n{analise_texto}\n\n'
+        f'Atenciosamente,\nTorres Capital'
+    )
+
+    enviar_email_outlook(assunto, corpo, EMAIL_DESTINATARIOS, anexo_path=grafico_path)
 
 else:
     print("⚠️ Nenhum dado válido disponível.")
