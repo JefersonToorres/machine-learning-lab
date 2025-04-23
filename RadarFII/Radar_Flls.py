@@ -5,35 +5,45 @@ import matplotlib.ticker as mtick
 from datetime import datetime
 import google.generativeai as genai
 import os
-import win32com.client  
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+import base64
+from dotenv import load_dotenv
 
 # === CONFIGURAÇÕES ===
 API_TOKEN_BRAPI = 'wd11P6ggfscs5UYkr6XB6t'
 GOOGLE_API_KEY = "AIzaSyBAzeGLTtDWhl3L-GHc7KshqWaGa5_MyG4"
+load_dotenv()
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 fii_list = ['CPTR11', 'HGLG11', 'KNRI11', 'RECR11', 'JURO11','TRXF11','HSML11','KNSC11','XPLG11']
 EMAIL_DESTINATARIOS = ['torres.sillva@icloud.com']
 
-# === Função para enviar e-mail pelo Outlook ===
-def enviar_email_outlook(assunto, corpo, destinatarios, anexo_path=None):
+# === Função para enviar e-mail pelo SendGrid ===
+def enviar_email_sendgrid(assunto, corpo, destinatarios, anexo_path=None):
+    message = Mail(
+        from_email='torres.sillva@icloud.com',
+        to_emails=destinatarios,
+        subject=assunto,
+        plain_text_content=corpo
+    )
+
+    if anexo_path and os.path.exists(anexo_path):
+        with open(anexo_path, 'rb') as f:
+            data = f.read()
+            encoded = base64.b64encode(data).decode()
+            attachment = Attachment()
+            attachment.file_content = FileContent(encoded)
+            attachment.file_type = FileType('image/png')
+            attachment.file_name = FileName(os.path.basename(anexo_path))
+            attachment.disposition = Disposition('attachment')
+            message.attachment = attachment
+
     try:
-        outlook = win32com.client.Dispatch("Outlook.Application")
-        mail = outlook.CreateItem(0)
-        mail.Subject = assunto
-        mail.Body = corpo
-        mail.To = "; ".join(destinatarios)
-
-        if anexo_path:
-            anexo_path = os.path.abspath(anexo_path)
-            print(f"📄 Tentando anexar: {anexo_path}")
-            if os.path.exists(anexo_path):
-                mail.Attachments.Add(anexo_path)
-            else:
-                raise FileNotFoundError(f"Anexo não encontrado: {anexo_path}")
-
-        mail.Send()
-        print("📧 E-mail enviado com sucesso via Outlook!")
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print(f"📧 E-mail enviado com status {response.status_code} via SendGrid!")
     except Exception as e:
-        raise Exception(f"Erro ao enviar e-mail via Outlook: {e}")
+        raise Exception(f"Erro ao enviar e-mail via SendGrid: {e}")
 
 # === CONFIGURA O GEMINI ===
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -101,7 +111,7 @@ if not df.empty:
 
     {df.to_string(index=False)}
 
-    Gere um relatório do mercado financeiro de hoje. Você é um gestor do fundo Torres Capital e deve fazer uma análise detalhada sobre como foi o dia dos seus ativos.Me fale sugestoes de investimentos.
+    Gere um relatório do mercado financeiro de hoje. Você é um gestor do fundo Torres Capital e deve fazer uma análise detalhada sobre como foi o dia dos seus ativos. Me fale sugestões de investimentos.
     """
     model = genai.GenerativeModel('gemini-2.0-flash')
     resposta = model.generate_content(prompt)
@@ -116,7 +126,7 @@ if not df.empty:
         f'Atenciosamente,\nTorres Capital'
     )
 
-    enviar_email_outlook(assunto, corpo, EMAIL_DESTINATARIOS, anexo_path=grafico_path)
+    enviar_email_sendgrid(assunto, corpo, EMAIL_DESTINATARIOS, anexo_path=grafico_path)
 
 else:
     print("⚠️ Nenhum dado válido disponível.")
