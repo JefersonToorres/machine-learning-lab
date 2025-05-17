@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  radar_fiis:
+    build: .
+    container_name: radar_fiis
+    env_file:
+      - .env
+    volumes:
+      - ./relatorios:/app/relatorios
